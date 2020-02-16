@@ -21,7 +21,7 @@ type Octocat struct {
 }
 
 // Get retrieves the @octocat profile from GitHub.com
-func Get() (*Octocat, error) {
+func Get(octocat *Octocat) error {
 	url := "https://api.github.com/users/octocat"
 
 	// Instantiate an HTTP client so we can add request headers
@@ -33,25 +33,24 @@ func Get() (*Octocat, error) {
 	// Perform the request
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Unexpected status code, %d, when fetching %s", resp.StatusCode, url)
+		return fmt.Errorf("Unexpected status code, %d, when fetching %s", resp.StatusCode, url)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var octocat Octocat
-	err = json.Unmarshal(body, &octocat)
+	err = json.Unmarshal(body, octocat)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &octocat, nil
+	return nil
 }

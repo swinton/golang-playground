@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 // Octocat type represents the Octocat user
@@ -22,7 +23,15 @@ type Octocat struct {
 // Get retrieves the @octocat profile from GitHub.com
 func Get() (*Octocat, error) {
 	url := "https://api.github.com/users/octocat"
-	resp, err := http.Get(url)
+
+	// Instantiate an HTTP client so we can add request headers
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Add("User-Agent", "swinton/golang-playground")
+	req.Header.Add("Authorization", fmt.Sprintf("bearer %s", os.Getenv("GITHUB_TOKEN")))
+
+	// Perform the request
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
